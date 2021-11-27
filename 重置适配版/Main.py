@@ -7,15 +7,11 @@ get = pygame.display.set_mode()
 get_x = get.get_size()[0]
 get_y = get.get_size()[1]
 get.fill((255,255,255))
-def SysFont(name, size, bold=False, italic=False, constructor=None):
-    pass
-def render(self, text, antialias, color, background=None):
-    pass
-def Get_print(Title,x,y,color=(0,0,0),Size=72):
+def Get_print(Title,x,y,color=(0,0,0),Size=round(get_x/35.5)):
         font =  pygame.font.SysFont('microsoft Yahei',Size)
         surface = font.render(Title,True,color)
         get.blit(surface,(x,y))
-def Window_print(Title,x,y,color=(0,0,0),Size=72):
+def Window_print(Title,x,y,color=(0,0,0),Size=round(get_x/35.5)):
         font =  pygame.font.SysFont('microsoft Yahei',Size)
         surface = font.render(Title,True,color)
         window.blit(surface,(x,y))
