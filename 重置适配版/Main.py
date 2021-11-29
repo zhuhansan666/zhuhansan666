@@ -3,9 +3,11 @@ from time import sleep as de
 from pygame.constants import K_ESCAPE, K_LALT, K_RALT, K_SPACE, KEYDOWN, KEYUP, QUIT ,K_LEFT ,K_RIGHT
 pygame.init()
 b = False
+low_list = []
 get = pygame.display.set_mode()
 get_x = get.get_size()[0]
 get_y = get.get_size()[1]
+low_list_size = round(get_x/35.5)
 get.fill((255,255,255))
 def Get_print(Title,x,y,color=(0,0,0),Size=round(get_x/35.5)):
         font =  pygame.font.SysFont('microsoft Yahei',Size)
@@ -90,6 +92,9 @@ def New_list():
     students_list = []
     r = number
     run_number = r
+    if not type(run_number) == int:
+        pygame.quit()
+        sys.exit()
     for i in range(run_number):
         students_list.append(i+1)
     return students_list
@@ -112,6 +117,7 @@ while True:
     now = students_list[random.randint(0, r-1)]
     students_list.remove(now)
     r = r - 1
+    Window_print('已抽'+str(low_list),get_x*0.2 , get_y*0.25,Size=low_list_size)
     Window_print('现在为{}号'.format(now),get_x*0.2,get_y*0.35,Size=round(get_x/30))
     Window_print('剩余{}个'.format(len(students_list)),get_x*0.2,get_y*0.45,Size=round(get_x/30))
     pygame.display.update()
@@ -165,6 +171,7 @@ while True:
                 Window_print('下一个', 1,1)
                 pygame.display.update()
                 de(0.1)
+                low_list.append(now)
                 wait = False
             else:
                 pygame.draw.rect(window,(255,255,255),j3,0)
@@ -179,3 +186,4 @@ while True:
                 Window_print('下一个', j3[0]*1.07,j3[1]*1.035)
                 pygame.display.update()
     pygame.draw.rect(window,(255,255,255),(1,1,get_x,get_y*0.79),0)
+    low_list_size = round((get_x/35.5)-((get_x/35.5)*(len(low_list)/run_number/1.57)))
