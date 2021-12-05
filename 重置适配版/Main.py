@@ -9,6 +9,7 @@ get = pygame.display.set_mode()
 get_x = get.get_size()[0]
 get_y = get.get_size()[1]
 low_list_x = get_x*0.2
+re_lowlist_x = get_x*0.2
 get.fill((255,255,255))
 pygame.display.update()
 def Get_print(Title,x,y,color=(0,0,0),Size=round(get_x/35.5)):
@@ -129,12 +130,16 @@ while True:
         pygame.quit()
         sys.exit()
     if wait == 0:
+        re_lowlist_x = low_list_x
+        huan_low_x = low_list_x
         Window_print('涛哥的随机抽人程序',get_x*0.27,get_y*0.1,Size=round(get_x/20))
         Window_print('已抽'+str(low_list),low_list_x , get_y*0.25)
         Window_print('现在未抽取',get_x*0.2,get_y*0.35,Size=round(get_x/30))
         Window_print('剩余{}个'.format(len(students_list)),get_x*0.2,get_y*0.45,Size=round(get_x/30))
         pygame.display.update()
     elif wait == 1:
+        re_lowlist_x = low_list_x
+        huan_low_x = low_list_x
         wait = 0
         shang = 0
         Window_print('涛哥的随机抽人程序',get_x*0.27,get_y*0.1,Size=round(get_x/20))
@@ -142,13 +147,23 @@ while True:
         low_list.append(now)
         students_list.remove(now)
         r = r - 1
-        Window_print('已抽'+str(low_list),low_list_x , get_y*0.25)
+        for i in range(round(run_number/2)):
+            pygame.draw.rect(window,(255,255,255),(1,1,get_x,get_y*0.7),0)
+            Window_print('涛哥的随机抽人程序',get_x*0.27,get_y*0.1,Size=round(get_x/20))
+            Window_print('#*正在抽取 : {}号*#'.format(random.randint(1, r+1)),get_x*0.2,get_y*0.35,Size=round(get_x/30),color=(random.randint(0, 255),random.randint(0, 255),random.randint(0, 255)))
+            Window_print('剩余{}个'.format(len(students_list)),get_x*0.2,get_y*0.45,Size=round(get_x/30))
+            pygame.display.update()
+            de(0.07)
+        pygame.draw.rect(window,(255,255,255),(1,1,get_x,get_y*0.7),0)
+        Window_print('涛哥的随机抽人程序',get_x*0.27,get_y*0.1,Size=round(get_x/20))
         Window_print('现在为{}号'.format(now),get_x*0.2,get_y*0.35,Size=round(get_x/30))
         Window_print('剩余{}个'.format(len(students_list)),get_x*0.2,get_y*0.45,Size=round(get_x/30))
         pygame.display.update()
+        de(0.1)
+        Window_print('已抽'+str(low_list),low_list_x , get_y*0.25)
+        pygame.display.update()
     elif wait == 2:
         wait = 0
-        huan_low_x = low_list_x
         if shang == 0:
             low_list_x = get_x*0.2
         elif run_number > 1000:
@@ -319,3 +334,8 @@ while True:
         low_list_x -= get_x*0.1
     else:
         low_list_x -= get_x*0.03
+    if not shang == 0 and not wait == 2:
+        if run_number > 1000:
+            low_list_x = re_lowlist_x-get_x*0.1
+        else:
+            low_list_x = re_lowlist_x-get_x*0.03
