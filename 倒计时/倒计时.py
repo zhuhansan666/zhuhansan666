@@ -70,16 +70,18 @@ def is_admin():
 def check_ini(rootfile:str,filename:str,info:str="TurnOnAutoStart = False\nMaiTextSize = auto\n"):
     if rootfile[-1] == '\\' or  rootfile[-1] == '/':
         _file_ = os.path.exists("{}{}.ini".format(rootfile,filename))
+        main_file = "{}{}.ini".format(rootfile,filename)
     else:
         _file_ = os.path.exists("{}/{}.ini".format(rootfile,filename))
+        main_file = "{}/{}.ini".format(rootfile,filename)
     if not _file_:
         try:
-            with open('{}.ini'.format(filename),'w+',encoding='utf-8') as f:
+            with open( main_file,'w+',encoding='utf-8') as f:
                 f.write(info)
             return info.split('\n')
         except PermissionError:
             if is_admin():
-                with open('{}.ini'.format(filename),'w+',encoding='utf-8') as f:
+                with open( main_file,'w+',encoding='utf-8') as f:
                     f.write(info)
                 return info.split('\n')
             else:
@@ -87,10 +89,18 @@ def check_ini(rootfile:str,filename:str,info:str="TurnOnAutoStart = False\nMaiTe
                 sys.exit(0)
     else:
         try:
-            with open('{}.ini'.format(filename),'r+',encoding='utf-8') as f:
+            with open( main_file,'r+',encoding='utf-8') as f:
                 r = f.readlines()
             return r
-        except EOFError as e:
+        except PermissionError:
+            if is_admin():
+                with open(main_file,'r+',encoding='utf-8') as f:
+                    r = f.readlines()
+                    return r
+            else:
+                ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
+                sys.exit(0)
+        except Exception as e:
             showerror('错误', '没有预期的错误: {}'.format(e))
             return False
 
@@ -106,7 +116,7 @@ def write_reg(Error=False):
         key_info = '"{}"'.format(sys.argv[0])
         zcb = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run'
         key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,zcb,access=winreg.KEY_ALL_ACCESS)
-        winreg.SetValueEx(key,'autoTurnOFF',0,winreg.REG_SZ,key_info)
+        winreg.SetValueEx(key,'倒计时',0,winreg.REG_SZ,key_info)
     else:
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
         if Error:
@@ -234,28 +244,28 @@ f11_pl = 5*fps
 pzautoF5 = False
 autoF5 = False
 
-
-for pz in r2:
-    if 'MaiTextSize' in pz and '=' in pz:
-        pz = str(pz).replace(' ','')
-        pz = pz.split('=')[1]
-        if not pz == 'auto' and pz.isdigit():
-            size = int(pz)
-    if 'TurnOnAutoStart' in pz and '=' in pz:
-        pz = str(pz).replace(' ','')
-        pz = pz.split('=')[1]
-        if pz.isalnum() and bool(pz):
-            write_reg()
-    if '实时更新' in pz and '=' in pz:
-        pz = str(pz).replace(' ','')
-        pz = pz.split('=')[1]
-        if pz.isalnum() and bool(pz):
-            autoF5 = True
-    if '配置文件实时更新' in pz and '=' in pz:
-        pz = str(pz).replace(' ','')
-        pz = pz.split('=')[1]
-        if pz.isalnum() and bool(pz):
-            pzautoF5 = True
+if r2 != False:
+    for pz in r2:
+        if 'MaiTextSize' in pz and '=' in pz:
+            pz = str(pz).replace(' ','')
+            pz = pz.split('=')[1]
+            if not pz == 'auto' and pz.isdigit():
+                size = int(pz)
+        if 'TurnOnAutoStart' in pz and '=' in pz:
+            pz = str(pz).replace(' ','')
+            pz = pz.split('=')[1]
+            if 'True' in pz:
+                write_reg()
+        if '实时更新' in pz and '=' in pz:
+            pz = str(pz).replace(' ','')
+            pz = pz.split('=')[1]
+            if 'True' in pz:
+                autoF5 = True
+        if '配置文件实时更新' in pz and '=' in pz:
+            pz = str(pz).replace(' ','')
+            pz = pz.split('=')[1]
+            if 'True' in pz:
+                pzautoF5 = True
 # 结束系统自动配置
 
 # 结束配置部分___________________________________
@@ -279,27 +289,28 @@ except TypeError:
     while True:
         if pzautoF5:
             r2 = check_ini(file,'配置')
-            for pz in r2:
-                if 'MaiTextSize' in pz and '=' in pz:
-                    pz = str(pz).replace(' ','')
-                    pz = pz.split('=')[1]
-                    if not pz == 'auto' and pz.isdigit():
-                        size = int(pz)
-                if 'TurnOnAutoStart' in pz and '=' in pz:
-                    pz = str(pz).replace(' ','')
-                    pz = pz.split('=')[1]
-                    if pz.isalnum() and bool(pz):
-                        write_reg()
-                if '实时更新' in pz and '=' in pz:
-                    pz = str(pz).replace(' ','')
-                    pz = pz.split('=')[1]
-                    if pz.isalnum() and bool(pz):
-                        autoF5 = True
-                if '配置文件实时更新' in pz and '=' in pz:
-                    pz = str(pz).replace(' ','')
-                    pz = pz.split('=')[1]
-                    if pz.isalnum() and bool(pz):
-                        pzautoF5 = True
+            if r2 != False:
+                for pz in r2:
+                    if 'MaiTextSize' in pz and '=' in pz:
+                        pz = str(pz).replace(' ','')
+                        pz = pz.split('=')[1]
+                        if not pz == 'auto' and pz.isdigit():
+                            size = int(pz)
+                    if 'TurnOnAutoStart' in pz and '=' in pz:
+                        pz = str(pz).replace(' ','')
+                        pz = pz.split('=')[1]
+                        if 'True' in pz:
+                            write_reg()
+                    if '实时更新' in pz and '=' in pz:
+                        pz = str(pz).replace(' ','')
+                        pz = pz.split('=')[1]
+                        if 'True' in pz:
+                            autoF5 = True
+                    if '配置文件实时更新' in pz and '=' in pz:
+                        pz = str(pz).replace(' ','')
+                        pz = pz.split('=')[1]
+                        if 'True' in pz:
+                            pzautoF5 = True
         if autoF5:
             with open('{}times.json'.format(file),'r+',encoding='utf-8') as f2:
                 r2 = f2.read()
